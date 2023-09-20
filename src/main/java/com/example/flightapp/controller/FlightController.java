@@ -36,5 +36,18 @@ public class FlightController {
     public List<FlightDTO> getAllFlights() {
         return flightsService.getAllFlights();
     }
+    @GetMapping("/{id}")
+    public ResponseEntity<?> getFlightById(@PathVariable Long id) {
+        FlightDTO flightDTO = flightsService.getFlightById(id);
+        if (flightDTO != null) {
+            return ResponseEntity.ok(flightDTO);
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Flight not found");
+        }
+    }
+    @DeleteMapping("/{id}")
+    public void deleteFlight(@PathVariable Long id) {
+        flightsService.deleteFlight(id);
+    }
 
 }

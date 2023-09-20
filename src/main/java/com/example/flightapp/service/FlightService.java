@@ -3,6 +3,8 @@ package com.example.flightapp.service;
 import com.example.flightapp.dto.DelayDTO;
 import com.example.flightapp.dto.FlightDTO;
 import com.example.flightapp.dto.PassengerDTO;
+import com.example.flightapp.exceptions.FlightNotFoundException;
+import com.example.flightapp.exceptions.NoFlightsFoundException;
 import com.example.flightapp.model.Delay;
 import com.example.flightapp.model.Flight;
 import com.example.flightapp.model.Passenger;
@@ -50,19 +52,41 @@ public class FlightService {
 
     public FlightDTO updateFlight(Long id, FlightDTO updatedFlightDTO) {
         Optional<Flight> existingFlightOptional = flightsRepository.findById(id);
-
         if (existingFlightOptional.isPresent()) {
             Flight existingFlight = existingFlightOptional.get();
             updateFlightFromDTO(existingFlight, updatedFlightDTO);
             Flight savedFlight = flightsRepository.save(existingFlight);
             return convertEntityToDto(savedFlight);
+        }else {
+            throw new FlightNotFoundException(id);
         }
 
-        return null;
     }
-
+    public void deleteFlight(Long id) {
+        List<Flight> flights = flightsRepository.findAll();
+        for(Flight flight:flights)
+        {
+            if(flight.getId().equals(id))
+            {   flight.setDeleted(true);
+                flightsRepository.save(flight);
+                return;
+            }
+        }
+        throw new FlightNotFoundException(id);
+    }
+    public FlightDTO getFlightById(Long id) {
+        Optional<Flight> flightOptional = flightsRepository.findById(id);
+        if (flightOptional.isPresent()) {
+            return convertEntityToDto(flightOptional.get());
+        } else {
+            throw new FlightNotFoundException(id);
+        }
+    }
     public List<FlightDTO> getAllFlights() {
         List<Flight> flights = flightsRepository.findAll();
+        if (flights.isEmpty()) {
+            throw new NoFlightsFoundException();
+        }
         return flights.stream()
                 .map(this::convertEntityToDto)
                 .collect(Collectors.toList());
