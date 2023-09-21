@@ -11,6 +11,9 @@ import com.example.flightapp.model.Passenger;
 import com.example.flightapp.repository.FlightRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -62,14 +65,14 @@ public class FlightService {
         }
 
     }
-    public void deleteFlight(Long id) {
+    public boolean deleteFlight(Long id) {
         List<Flight> flights = flightsRepository.findAll();
         for(Flight flight:flights)
         {
             if(flight.getId().equals(id))
             {   flight.setDeleted(true);
                 flightsRepository.save(flight);
-                return;
+                return true;
             }
         }
         throw new FlightNotFoundException(id);
@@ -82,8 +85,11 @@ public class FlightService {
             throw new FlightNotFoundException(id);
         }
     }
-    public List<FlightDTO> getAllFlights() {
-        List<Flight> flights = flightsRepository.findAll();
+    public List<FlightDTO> getAllFlights(Integer pageNumber, Integer pageSize) {
+
+        Pageable page= PageRequest.of(pageNumber,pageSize);
+        Page<Flight> allFlights = flightsRepository.findAll(page);
+        List<Flight> flights=allFlights.getContent();
         if (flights.isEmpty()) {
             throw new NoFlightsFoundException();
         }
