@@ -58,6 +58,14 @@ public class FlightController {
         List<FlightDTO> flights = flightsService.getAllFlights(pageNumber,pageSize);
         return ResponseEntity.ok(flights);
     }
+
+    @GetMapping("/show_cancelled")
+    public ResponseEntity<List<FlightDTO>> getAllFlightsData(
+            @RequestParam(value = "pageNumber",defaultValue = "1", required = false) Integer pageNumber,
+            @RequestParam(value = "pageSize", defaultValue = "5",required = false) Integer pageSize)  {
+        List<FlightDTO> flights = flightsService.getAllCancelFlights(pageNumber,pageSize);
+        return ResponseEntity.ok(flights);
+    }
     @GetMapping("/{id}")
     public ResponseEntity<FlightDTO> getFlightById(@PathVariable Long id) {
         FlightDTO flight = flightsService.getFlightById(id);

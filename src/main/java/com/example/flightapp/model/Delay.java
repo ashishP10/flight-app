@@ -14,7 +14,5 @@ public class Delay {
     private Integer code;
     private String reason;
     private Integer time;
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "flight_id", referencedColumnName = "id")
-    private Flight flight;
+
 }

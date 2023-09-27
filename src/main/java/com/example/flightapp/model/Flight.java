@@ -22,10 +22,9 @@ public class Flight {
     private Integer totalSeats;
     private boolean hasBusinessClass;
     @OneToMany(cascade = CascadeType.ALL)
-    @JoinColumn(name = "passenger_id", referencedColumnName = "id")
+    @JoinColumn(name = "flight_id", referencedColumnName = "id")
     private List<Passenger> passengers;
     @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "delay_id", referencedColumnName = "id")
     private Delay delay;
     private boolean isDeleted = false;
 

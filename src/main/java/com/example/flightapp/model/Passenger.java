@@ -17,10 +17,8 @@ public class Passenger {
     private String passportNo;
     private String country;
 
-    @ManyToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "flight_id")
+    @ManyToOne
+    @JoinColumn
     private Flight flight;
-
-
 
 }
