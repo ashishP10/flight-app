@@ -1,0 +1,4 @@
+flightNumber,tailNumber,origin,destination,iropStatus,totalSeats,hasBusinessClass,firstName,lastName,age,passportNo,country,delay_code,delay_reason,delay_time
+101,N12345,LAS,LAX,CX,200,true,John,Doe,30,A123456,USA,02,Boarding Discrepancy,10
+202,G67890,LAS,CDG,GR,150,false,Jane,Doe,25,B789012,UK,01,Weather Delay,20
+303,M45678,LAS,DEN,AR,180,true,Michael,Smith,40,C345678,USA,03,Technical Issue,15

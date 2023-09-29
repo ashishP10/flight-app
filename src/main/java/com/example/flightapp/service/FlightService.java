@@ -10,12 +10,18 @@ import com.example.flightapp.model.Delay;
 import com.example.flightapp.model.Flight;
 import com.example.flightapp.model.Passenger;
 import com.example.flightapp.repository.FlightRepository;
+import com.opencsv.CSVReader;
+import com.opencsv.exceptions.CsvValidationException;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -117,6 +123,44 @@ public class FlightService {
         return returnList.subList(startIndex, endIndex);
     }
 
+//    public void flightUpload() {
+//        try {
+//            FileReader filereader = new FileReader("src/main/resources/flight.csv");
+//            CSVReader csvReader = new CSVReader(filereader);
+//            csvReader.readNext();
+//            String[] nextRecord;
+//            FlightDTO flightDTO = new FlightDTO();
+//            while ((nextRecord = csvReader.readNext()) != null) {
+//                flightDTO.setFlightNumber(Integer.parseInt(nextRecord[0]));
+//                flightDTO.setTailNumber(nextRecord[1]);
+//                flightDTO.setOrigin(nextRecord[2]);
+//                flightDTO.setDestination(nextRecord[3]);
+//                flightDTO.setIropStatus(nextRecord[4]);
+//                flightDTO.setTotalSeats(Integer.parseInt(nextRecord[5]));
+//                flightDTO.setHasBusinessClass(Boolean.parseBoolean(nextRecord[6]));
+////                List<PassengerDTO> passengerDTOList = new ArrayList<>();
+////                PassengerDTO passengerDTO = new PassengerDTO();
+////                passengerDTO.setFirstName(nextRecord[7]);
+////                passengerDTO.setLastName(nextRecord[8]);
+////                passengerDTO.setAge(Integer.parseInt(nextRecord[9]));
+////                passengerDTO.setPassportNo(nextRecord[10]);
+////                passengerDTO.setCountry(nextRecord[11]);
+////                passengerDTOList.add(passengerDTO);
+////                DelayDTO delayDTO = new DelayDTO();
+////                delayDTO.setCode(Integer.parseInt(nextRecord[12]));
+////                delayDTO.setReason(nextRecord[13]);
+////                delayDTO.setTime(Integer.parseInt(nextRecord[14]));
+////                flightDTO.setDelay(delayDTO);
+////              flightDTO.setPassengers(passengerDTOList);
+//                Flight flight = convertToEntity(flightDTO);
+//                Flight savedFlight = flightsRepository.save(flight);
+//            }
+//
+//        } catch (CsvValidationException | IOException e) {
+//            throw new RuntimeException(e);
+//        }
+//    }
+
     public List<FlightDTO> getAllCancelFlights(Integer pageNumber, Integer pageSize) {
         List<Flight> flights = flightsRepository.findAll();
         if (flights.isEmpty()) {
@@ -179,5 +223,40 @@ public class FlightService {
         } else {
             flight.setDelay(null);
         }
+    }
+    public List<String[]> readData(InputStream inputStream) {
+        try (CSVReader reader = new CSVReader(new InputStreamReader(inputStream))) {
+            return reader.readAll();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+    public ResponseEntity<String> processCsvFile(MultipartFile file) {
+        try {
+            List<String[]> data = readData(file.getInputStream());
+            data = data.subList(1, data.size()-1);
+            if (data != null) {
+                for (String[] nextRecord : data) {
+                    FlightDTO flightDTO = new FlightDTO();
+                    flightDTO.setFlightNumber(Integer.parseInt(nextRecord[0]));
+                    flightDTO.setTailNumber(nextRecord[1]);
+                    flightDTO.setOrigin(nextRecord[2]);
+                    flightDTO.setDestination(nextRecord[3]);
+                    flightDTO.setIropStatus(nextRecord[4]);
+                    flightDTO.setTotalSeats(Integer.parseInt(nextRecord[5]));
+                    flightDTO.setHasBusinessClass(Boolean.parseBoolean(nextRecord[6]));
+
+                    Flight flight = convertToEntity(flightDTO);
+                    Flight savedFlight = flightsRepository.save(flight);
+                }
+            }
+
+            return ResponseEntity.status(HttpStatus.CREATED).body("CSV data has been processed and saved.");
+        } catch (IOException e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error processing CSV data.");
+        }
+
     }
 }

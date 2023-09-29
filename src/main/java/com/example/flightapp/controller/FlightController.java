@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.HashMap;
 import java.util.List;
@@ -58,7 +59,10 @@ public class FlightController {
         List<FlightDTO> flights = flightsService.getAllFlights(pageNumber,pageSize);
         return ResponseEntity.ok(flights);
     }
-
+    @PostMapping("/upload-csv")
+    public ResponseEntity<?> uploadCsvFile(@RequestPart("file") MultipartFile file) {
+        return flightsService.processCsvFile(file);
+    }
     @GetMapping("/show_cancelled")
     public ResponseEntity<List<FlightDTO>> getAllFlightsData(
             @RequestParam(value = "pageNumber",defaultValue = "1", required = false) Integer pageNumber,
