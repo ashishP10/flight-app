@@ -11,7 +11,6 @@ import com.example.flightapp.model.Flight;
 import com.example.flightapp.model.Passenger;
 import com.example.flightapp.repository.FlightRepository;
 import com.opencsv.CSVReader;
-import com.opencsv.exceptions.CsvValidationException;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -48,7 +47,7 @@ public class FlightService {
     private Flight convertToEntity(FlightDTO flightDTO) {
         return modelMapper.map(flightDTO, Flight.class);
     }
-    private FlightDTO convertEntityToDto(Flight flight) {
+    private FlightDTO convertEntityToDto(List<Delay> flight) {
         FlightDTO flightDTO = modelMapper.map(flight, FlightDTO.class);
 
         // Convert passengers to PassengerDTO
