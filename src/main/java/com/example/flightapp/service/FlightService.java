@@ -47,7 +47,7 @@ public class FlightService {
     private Flight convertToEntity(FlightDTO flightDTO) {
         return modelMapper.map(flightDTO, Flight.class);
     }
-    private FlightDTO convertEntityToDto(List<Delay> flight) {
+    private FlightDTO convertEntityToDto(Flight flight) {
         FlightDTO flightDTO = modelMapper.map(flight, FlightDTO.class);
 
         // Convert passengers to PassengerDTO

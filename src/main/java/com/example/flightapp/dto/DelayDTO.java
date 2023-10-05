@@ -7,9 +7,11 @@ import lombok.Setter;
 @Getter
 @Setter
 public class DelayDTO {
-    private Long id;
+    @NotNull(message = "Delay code is required")
     private int code;
+    @NotNull(message = "Delay reason is required")
     private String reason;
+    @NotNull(message = "Delay time is required")
     private int time;
 
 }
