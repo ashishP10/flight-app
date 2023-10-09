@@ -19,5 +19,8 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
     }
 
-    // Add more exception handlers if needed
+    @ExceptionHandler(PassengerLimitExceedException.class)
+    public ResponseEntity<String> passengerLimitExceedException(PassengerLimitExceedException ex) {
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_ACCEPTABLE);
+    }
 }
