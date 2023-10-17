@@ -136,7 +136,6 @@ public class FlightService {
         }
     }
     public List<FlightDTO> getAllFlights(Integer pageNumber, Integer pageSize) {
-        Pageable page= PageRequest.of(pageNumber,pageSize);
         List<Flight> flights ;
         try {
             flights = flightsRepository.findAll();
