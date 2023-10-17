@@ -25,7 +25,6 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 public class FlightService {
@@ -53,13 +52,30 @@ public class FlightService {
         return modelMapper.map(flightDTO, Flight.class);
     }
     private FlightDTO convertEntityToDto(Flight flight) {
-        FlightDTO flightDTO = modelMapper.map(flight, FlightDTO.class);
-
+        FlightDTO flightDTO = new FlightDTO();
+        flightDTO.setId(flight.getId());
+        flightDTO.setFlightNumber(flight.getFlightNumber());
+        flightDTO.setDestination(flight.getDestination());
+        flightDTO.setTailNumber(flightDTO.getTailNumber());
+        flightDTO.setHasBusinessClass(flight.isHasBusinessClass());
+        flightDTO.setIropStatus(flight.getIropStatus());
+        flightDTO.setOrigin(flight.getOrigin());
         // Convert passengers to PassengerDTO
-        List<PassengerDTO> passengerDTOs = flight.getPassengers().stream()
-                .map(passenger -> modelMapper.map(passenger, PassengerDTO.class))
-                .collect(Collectors.toList());
-        flightDTO.setPassengers(passengerDTOs);
+
+
+        List<PassengerDTO> passengerDTOList=new ArrayList<>();
+        for(Passenger passenger:flight.getPassengers())
+        {
+            PassengerDTO passengerDTO=new PassengerDTO();
+            passengerDTO.setCountry(passenger.getCountry());
+            passengerDTO.setId(passenger.getId());
+            passengerDTO.setAge(passenger.getAge());
+            passengerDTO.setFirstName(passenger.getFirstName());
+            passengerDTO.setLastName(passenger.getLastName());
+            passengerDTO.setPassportNo(passenger.getPassportNo());
+            passengerDTOList.add(passengerDTO);
+        }
+        flightDTO.setPassengers(passengerDTOList);
 
         // Convert delay to DelayDTO
         if (flight.getDelay() != null) {
@@ -90,7 +106,7 @@ public class FlightService {
 
     }
     public boolean deleteFlight(Long id) {
-        List<Flight> flights = null;
+        List<Flight> flights ;
         try{
             flights = flightsRepository.findAll();
         }catch (Exception e)
@@ -109,7 +125,7 @@ public class FlightService {
                 }
             }
         }
-        throw new FlightNotFoundException(id);
+        return false;
     }
     public FlightDTO getFlightById(Long id) {
         Optional<Flight> flightOptional = flightsRepository.findById(id);
@@ -121,7 +137,7 @@ public class FlightService {
     }
     public List<FlightDTO> getAllFlights(Integer pageNumber, Integer pageSize) {
         Pageable page= PageRequest.of(pageNumber,pageSize);
-        List<Flight> flights = null;
+        List<Flight> flights ;
         try {
             flights = flightsRepository.findAll();
         } catch (Exception e) {
@@ -148,7 +164,7 @@ public class FlightService {
 
     public List<FlightDTO> getAllCancelFlights(Integer pageNumber, Integer pageSize) {
 
-        List<Flight> flights = null;
+        List<Flight> flights ;
         try {
             flights = flightsRepository.findAll();
         } catch (Exception e) {

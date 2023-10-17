@@ -42,11 +42,7 @@ public class FlightController {
         }
 
         FlightDTO updatedFlight = flightsService.updateFlight(id, updatedFlightDTO);
-        if (updatedFlight != null) {
-            return ResponseEntity.ok(updatedFlight);
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+        return ResponseEntity.ok(updatedFlight);
     }
 
     @GetMapping
@@ -58,7 +54,8 @@ public class FlightController {
     }
     @PostMapping("/upload-csv")
     public ResponseEntity<?> uploadCsvFile(@RequestPart("file") MultipartFile file) {
-        return flightsService.processCsvFile(file);
+        ResponseEntity<String> response= flightsService.processCsvFile(file);
+        return ResponseEntity.ok(response);
     }
     @GetMapping("/show_cancelled")
     public ResponseEntity<List<FlightDTO>> getAllFlightsData(

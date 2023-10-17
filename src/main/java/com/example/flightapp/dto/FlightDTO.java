@@ -34,4 +34,6 @@ public class FlightDTO {
     private List<PassengerDTO> passengers;
     @NotNull(message = "Delay is required")
     private DelayDTO delay;
+
 }
+

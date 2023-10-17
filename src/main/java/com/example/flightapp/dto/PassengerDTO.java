@@ -1,6 +1,5 @@
 package com.example.flightapp.dto;
 
-import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -10,7 +9,7 @@ public class PassengerDTO {
     private Long id;
     private String firstName;
     private String lastName;
-    private int age;
+    private Integer age;
     private String passportNo;
     private String country;
 }
