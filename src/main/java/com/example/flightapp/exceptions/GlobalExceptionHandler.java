@@ -14,13 +14,21 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
     }
 
-    @ExceptionHandler(NoFlightsFoundException.class)
-    public ResponseEntity<String> handleNoFlightsFoundException(NoFlightsFoundException ex) {
+    @ExceptionHandler(NoRecordFoundException.class)
+    public ResponseEntity<String> handleNoFlightsFoundException(NoRecordFoundException ex) {
         return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(PassengerLimitExceedException.class)
-    public ResponseEntity<String> passengerLimitExceedException(PassengerLimitExceedException ex) {
+    public ResponseEntity<String> handlePassengerLimitExceedException(PassengerLimitExceedException ex) {
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_ACCEPTABLE);
+    }
+    @ExceptionHandler(NoPassengerFoundException.class)
+    public ResponseEntity<String> handleNoPassengerFoundException(NoPassengerFoundException ex) {
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_ACCEPTABLE);
+    }
+    @ExceptionHandler(PassengerAgeRestriction.class)
+    public ResponseEntity<String> handlePassengerAgeRestriction(PassengerAgeRestriction ex) {
         return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_ACCEPTABLE);
     }
 }

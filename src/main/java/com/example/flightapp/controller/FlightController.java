@@ -31,7 +31,11 @@ public class FlightController {
         FlightDTO createdFlight = flightsService.createFlight(flightDTO);
         return ResponseEntity.ok(createdFlight);
     }
-
+    @PostMapping("/upload-csv")
+    public ResponseEntity<?> uploadCsvFile(@RequestPart("file") MultipartFile file) {
+        ResponseEntity<String> response= flightsService.processCsvFile(file);
+        return ResponseEntity.ok(response);
+    }
     @PutMapping("/{id}")
     public ResponseEntity<?> updateFlight(@PathVariable Long id, @Valid @RequestBody FlightDTO updatedFlightDTO, BindingResult result) {
         if (result.hasErrors()) {
@@ -51,11 +55,6 @@ public class FlightController {
             @RequestParam(value = "pageSize", defaultValue = "5",required = false) Integer pageSize)  {
         List<FlightDTO> flights = flightsService.getAllFlights(pageNumber,pageSize);
         return ResponseEntity.ok(flights);
-    }
-    @PostMapping("/upload-csv")
-    public ResponseEntity<?> uploadCsvFile(@RequestPart("file") MultipartFile file) {
-        ResponseEntity<String> response= flightsService.processCsvFile(file);
-        return ResponseEntity.ok(response);
     }
     @GetMapping("/show_cancelled")
     public ResponseEntity<List<FlightDTO>> getAllFlightsData(

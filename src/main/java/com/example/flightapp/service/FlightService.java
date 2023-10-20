@@ -5,7 +5,7 @@ import com.example.flightapp.dto.FlightDTO;
 import com.example.flightapp.dto.PassengerDTO;
 import com.example.flightapp.exceptions.FlightNotFoundException;
 import com.example.flightapp.exceptions.FlightServiceException;
-import com.example.flightapp.exceptions.NoFlightsFoundException;
+import com.example.flightapp.exceptions.NoRecordFoundException;
 import com.example.flightapp.exceptions.PassengerLimitExceedException;
 import com.example.flightapp.model.Delay;
 import com.example.flightapp.model.Flight;
@@ -14,8 +14,6 @@ import com.example.flightapp.repository.FlightRepository;
 import com.opencsv.CSVReader;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -142,9 +140,6 @@ public class FlightService {
         } catch (Exception e) {
             throw new FlightServiceException("Error occurred while fetching flights.", e);
         }
-        if (flights.isEmpty()) {
-            throw new NoFlightsFoundException();
-        }
         List<FlightDTO> returnList=new ArrayList<>();
         for(Flight flight:flights)
         {
@@ -156,7 +151,7 @@ public class FlightService {
         int startIndex = (pageNumber - 1) * pageSize;
         int endIndex = Math.min(startIndex + pageSize, returnList.size());
         if (returnList.isEmpty()) {
-            throw new NoFlightsFoundException();
+            throw new NoRecordFoundException("Flight record is unavailable");
         }
         return returnList.subList(startIndex, endIndex);
     }
@@ -169,9 +164,6 @@ public class FlightService {
         } catch (Exception e) {
             throw new FlightServiceException("Error occurred while fetching flights.", e);
         }
-        if (flights.isEmpty()) {
-            throw new NoFlightsFoundException();
-        }
         List<FlightDTO> returnList=new ArrayList<>();
         for(Flight flight:flights)
         {
@@ -183,7 +175,7 @@ public class FlightService {
         int startIndex = (pageNumber - 1) * pageSize;
         int endIndex = Math.min(startIndex + pageSize, returnList.size());
         if (returnList.isEmpty()) {
-            throw new NoFlightsFoundException();
+            throw new NoRecordFoundException("Flight record is unavailable");
         }
         return returnList.subList(startIndex, endIndex);
     }

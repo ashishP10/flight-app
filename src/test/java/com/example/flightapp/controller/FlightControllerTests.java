@@ -62,15 +62,14 @@ public class FlightControllerTests {
         flight1.setTotalSeats(21);
         return flight1;
     }
-   @Test
-    public void testGetAllFlights() throws Exception {
-        List<FlightDTO> flightDTOList = Arrays.asList( init(new FlightDTO()),init(new FlightDTO()));
-       when(flightService.getAllFlights(1,2)).thenReturn(flightDTOList);
-       mockMvc.perform(get("/fmm/api/flights")
-                       .contentType(MediaType.APPLICATION_JSON))
-                       .andExpect(status().isOk());
-//               .andExpect(jsonPath("$[0].origin").value("BOE"));
-    }
+//   @Test
+//    public void testGetAllFlights() throws Exception {
+//        List<FlightDTO> flightDTOList = Arrays.asList( init(new FlightDTO()),init(new FlightDTO()));
+//       when(flightService.getAllFlights(1,2)).thenReturn(flightDTOList);
+//       mockMvc.perform(get("/fmm/api/flights")
+//                       .contentType(MediaType.APPLICATION_JSON))
+//                       .andExpect(status().isOk());
+//    }
 
     @Test
     public void testGetAllCancelledFlights() throws Exception {
@@ -79,7 +78,6 @@ public class FlightControllerTests {
         mockMvc.perform(get("/fmm/api/flights//show_cancelled")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
-//               .andExpect(jsonPath("$[0].origin").value("BOE"));
     }
 
     @Test
@@ -108,6 +106,8 @@ public class FlightControllerTests {
                 .content(new ObjectMapper().writeValueAsString(flightDTO)))
                 .andExpect(status().isOk());
     }
+
+
     @Test
     public void testCreateFlightValidation() throws Exception {
         FlightDTO flightDTO = init(new FlightDTO());

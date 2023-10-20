@@ -1,4 +1,4 @@
-package com.example.flightapp;
+package com.example.flightapp.service;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -15,7 +15,6 @@ import com.example.flightapp.model.Delay;
 import com.example.flightapp.model.Flight;
 import com.example.flightapp.model.Passenger;
 import com.example.flightapp.repository.FlightRepository;
-import com.example.flightapp.service.FlightService;
 import org.junit.jupiter.api.Test;
 
 import org.mockito.InjectMocks;
@@ -126,6 +125,15 @@ public class FlightServiceTests {
         when(flightRepository.findAll()).thenReturn(mockFlights);
 
         List<FlightDTO> flights = flightService.getAllFlights(1,3);
+        assertEquals(1, flights.size());
+    }
+
+    @Test
+    public void testGetAllCancelFlights() {
+        List<Flight> mockFlights = new ArrayList<>();
+        mockFlights.add(initModel(new Flight()));
+        when(flightRepository.findAll()).thenReturn(mockFlights);
+        List<FlightDTO> flights = flightService.getAllCancelFlights(1,3);
         assertEquals(1, flights.size());
     }
 
