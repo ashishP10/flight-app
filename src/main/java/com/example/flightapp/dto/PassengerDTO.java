@@ -8,9 +8,14 @@ import lombok.Setter;
 @Setter
 public class PassengerDTO {
     private Long id;
+    @NotNull(message = "First name is required")
     private String firstName;
+    @NotNull(message = "Last name is required")
     private String lastName;
-    private int age;
+    @NotNull(message = "Age is required")
+    private Integer age;
+    @NotNull(message = "Passport number is required")
     private String passportNo;
+    @NotNull(message = "Country is required")
     private String country;
 }

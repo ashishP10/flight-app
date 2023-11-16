@@ -14,7 +14,7 @@ public class Passenger {
     private String firstName;
     private String lastName;
     private Integer age;
-    private String passportNo;
+    private String passportNo   ;
     private String country;
 
     @ManyToOne

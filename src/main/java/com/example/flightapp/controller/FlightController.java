@@ -6,7 +6,6 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
-import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -24,32 +23,30 @@ public class FlightController {
     public ResponseEntity<?> createFlight(@Valid @RequestBody FlightDTO flightDTO, BindingResult result) {
         if (result.hasErrors()) {
             Map<String, String> errors = new HashMap<>();
-            for (FieldError error : result.getFieldErrors()) {
-                errors.put(error.getField(), error.getDefaultMessage());
-            }
+            result.getFieldErrors()
+                    .forEach(error -> errors.put(error.getField(), error.getDefaultMessage()));
             return ResponseEntity.badRequest().body(errors);
         }
 
         FlightDTO createdFlight = flightsService.createFlight(flightDTO);
         return ResponseEntity.ok(createdFlight);
     }
-
+    @PostMapping("/upload-csv")
+    public ResponseEntity<?> uploadCsvFile(@RequestPart("file") MultipartFile file) {
+        ResponseEntity<String> response= flightsService.processCsvFile(file);
+        return ResponseEntity.ok(response);
+    }
     @PutMapping("/{id}")
     public ResponseEntity<?> updateFlight(@PathVariable Long id, @Valid @RequestBody FlightDTO updatedFlightDTO, BindingResult result) {
         if (result.hasErrors()) {
             Map<String, String> errors = new HashMap<>();
-            for (FieldError error : result.getFieldErrors()) {
-                errors.put(error.getField(), error.getDefaultMessage());
-            }
+            result.getFieldErrors()
+                    .forEach(error -> errors.put(error.getField(), error.getDefaultMessage()));
             return ResponseEntity.badRequest().body(errors);
         }
 
         FlightDTO updatedFlight = flightsService.updateFlight(id, updatedFlightDTO);
-        if (updatedFlight != null) {
-            return ResponseEntity.ok(updatedFlight);
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+        return ResponseEntity.ok(updatedFlight);
     }
 
     @GetMapping
@@ -58,10 +55,6 @@ public class FlightController {
             @RequestParam(value = "pageSize", defaultValue = "5",required = false) Integer pageSize)  {
         List<FlightDTO> flights = flightsService.getAllFlights(pageNumber,pageSize);
         return ResponseEntity.ok(flights);
-    }
-    @PostMapping("/upload-csv")
-    public ResponseEntity<?> uploadCsvFile(@RequestPart("file") MultipartFile file) {
-        return flightsService.processCsvFile(file);
     }
     @GetMapping("/show_cancelled")
     public ResponseEntity<List<FlightDTO>> getAllFlightsData(

@@ -4,7 +4,8 @@ import com.example.flightapp.dto.DelayDTO;
 import com.example.flightapp.dto.FlightDTO;
 import com.example.flightapp.dto.PassengerDTO;
 import com.example.flightapp.exceptions.FlightNotFoundException;
-import com.example.flightapp.exceptions.NoFlightsFoundException;
+import com.example.flightapp.exceptions.FlightServiceException;
+import com.example.flightapp.exceptions.NoRecordFoundException;
 import com.example.flightapp.exceptions.PassengerLimitExceedException;
 import com.example.flightapp.model.Delay;
 import com.example.flightapp.model.Flight;
@@ -13,8 +14,6 @@ import com.example.flightapp.repository.FlightRepository;
 import com.opencsv.CSVReader;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -24,7 +23,6 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 public class FlightService {
@@ -39,22 +37,43 @@ public class FlightService {
         if (l > Passengerlength)
             throw new PassengerLimitExceedException();
         else {
-            Flight flight = convertToEntity(flightDTO);
-            Flight savedFlight = flightsRepository.save(flight);
-            return convertEntityToDto(savedFlight);
+            try {
+                Flight flight = convertToEntity(flightDTO);
+                Flight savedFlight = flightsRepository.save(flight);
+                return convertEntityToDto(savedFlight);
+            } catch (Exception e) {
+                throw new FlightServiceException("Error occurred while creating flight.", e);
+            }
         }
     }
     private Flight convertToEntity(FlightDTO flightDTO) {
         return modelMapper.map(flightDTO, Flight.class);
     }
     private FlightDTO convertEntityToDto(Flight flight) {
-        FlightDTO flightDTO = modelMapper.map(flight, FlightDTO.class);
-
+        FlightDTO flightDTO = new FlightDTO();
+        flightDTO.setId(flight.getId());
+        flightDTO.setFlightNumber(flight.getFlightNumber());
+        flightDTO.setDestination(flight.getDestination());
+        flightDTO.setTailNumber(flightDTO.getTailNumber());
+        flightDTO.setHasBusinessClass(flight.isHasBusinessClass());
+        flightDTO.setIropStatus(flight.getIropStatus());
+        flightDTO.setOrigin(flight.getOrigin());
         // Convert passengers to PassengerDTO
-        List<PassengerDTO> passengerDTOs = flight.getPassengers().stream()
-                .map(passenger -> modelMapper.map(passenger, PassengerDTO.class))
-                .collect(Collectors.toList());
-        flightDTO.setPassengers(passengerDTOs);
+
+
+        List<PassengerDTO> passengerDTOList=new ArrayList<>();
+        for(Passenger passenger:flight.getPassengers())
+        {
+            PassengerDTO passengerDTO=new PassengerDTO();
+            passengerDTO.setCountry(passenger.getCountry());
+            passengerDTO.setId(passenger.getId());
+            passengerDTO.setAge(passenger.getAge());
+            passengerDTO.setFirstName(passenger.getFirstName());
+            passengerDTO.setLastName(passenger.getLastName());
+            passengerDTO.setPassportNo(passenger.getPassportNo());
+            passengerDTOList.add(passengerDTO);
+        }
+        flightDTO.setPassengers(passengerDTOList);
 
         // Convert delay to DelayDTO
         if (flight.getDelay() != null) {
@@ -73,24 +92,38 @@ public class FlightService {
             int l = existingFlight.getPassengers().size();
             if (l > Passengerlength)
                 throw new PassengerLimitExceedException();
-            Flight savedFlight = flightsRepository.save(existingFlight);
-            return convertEntityToDto(savedFlight);
+            try {
+                Flight savedFlight = flightsRepository.save(existingFlight);
+                return convertEntityToDto(savedFlight);
+            } catch (Exception e) {
+                throw new FlightServiceException("Error occurred while updating flight.", e);
+            }
         }else {
             throw new FlightNotFoundException(id);
         }
 
     }
     public boolean deleteFlight(Long id) {
-        List<Flight> flights = flightsRepository.findAll();
+        List<Flight> flights ;
+        try{
+            flights = flightsRepository.findAll();
+        }catch (Exception e)
+        {
+            throw new FlightNotFoundException(id);
+        }
         for(Flight flight:flights)
         {
             if(flight.getId().equals(id))
             {   flight.setDeleted(true);
-                flightsRepository.save(flight);
-                return true;
+                try {
+                    flightsRepository.save(flight);
+                    return true;
+                } catch (Exception e) {
+                    throw new FlightServiceException("Error occurred while updating flight.", e);
+                }
             }
         }
-        throw new FlightNotFoundException(id);
+        return false;
     }
     public FlightDTO getFlightById(Long id) {
         Optional<Flight> flightOptional = flightsRepository.findById(id);
@@ -101,10 +134,11 @@ public class FlightService {
         }
     }
     public List<FlightDTO> getAllFlights(Integer pageNumber, Integer pageSize) {
-        Pageable page= PageRequest.of(pageNumber,pageSize);
-        List<Flight> flights = flightsRepository.findAll();
-        if (flights.isEmpty()) {
-            throw new NoFlightsFoundException();
+        List<Flight> flights ;
+        try {
+            flights = flightsRepository.findAll();
+        } catch (Exception e) {
+            throw new FlightServiceException("Error occurred while fetching flights.", e);
         }
         List<FlightDTO> returnList=new ArrayList<>();
         for(Flight flight:flights)
@@ -117,53 +151,18 @@ public class FlightService {
         int startIndex = (pageNumber - 1) * pageSize;
         int endIndex = Math.min(startIndex + pageSize, returnList.size());
         if (returnList.isEmpty()) {
-            throw new NoFlightsFoundException();
+            throw new NoRecordFoundException("Flight record is unavailable");
         }
         return returnList.subList(startIndex, endIndex);
     }
 
-//    public void flightUpload() {
-//        try {
-//            FileReader filereader = new FileReader("src/main/resources/flight.csv");
-//            CSVReader csvReader = new CSVReader(filereader);
-//            csvReader.readNext();
-//            String[] nextRecord;
-//            FlightDTO flightDTO = new FlightDTO();
-//            while ((nextRecord = csvReader.readNext()) != null) {
-//                flightDTO.setFlightNumber(Integer.parseInt(nextRecord[0]));
-//                flightDTO.setTailNumber(nextRecord[1]);
-//                flightDTO.setOrigin(nextRecord[2]);
-//                flightDTO.setDestination(nextRecord[3]);
-//                flightDTO.setIropStatus(nextRecord[4]);
-//                flightDTO.setTotalSeats(Integer.parseInt(nextRecord[5]));
-//                flightDTO.setHasBusinessClass(Boolean.parseBoolean(nextRecord[6]));
-////                List<PassengerDTO> passengerDTOList = new ArrayList<>();
-////                PassengerDTO passengerDTO = new PassengerDTO();
-////                passengerDTO.setFirstName(nextRecord[7]);
-////                passengerDTO.setLastName(nextRecord[8]);
-////                passengerDTO.setAge(Integer.parseInt(nextRecord[9]));
-////                passengerDTO.setPassportNo(nextRecord[10]);
-////                passengerDTO.setCountry(nextRecord[11]);
-////                passengerDTOList.add(passengerDTO);
-////                DelayDTO delayDTO = new DelayDTO();
-////                delayDTO.setCode(Integer.parseInt(nextRecord[12]));
-////                delayDTO.setReason(nextRecord[13]);
-////                delayDTO.setTime(Integer.parseInt(nextRecord[14]));
-////                flightDTO.setDelay(delayDTO);
-////              flightDTO.setPassengers(passengerDTOList);
-//                Flight flight = convertToEntity(flightDTO);
-//                Flight savedFlight = flightsRepository.save(flight);
-//            }
-//
-//        } catch (CsvValidationException | IOException e) {
-//            throw new RuntimeException(e);
-//        }
-//    }
-
     public List<FlightDTO> getAllCancelFlights(Integer pageNumber, Integer pageSize) {
-        List<Flight> flights = flightsRepository.findAll();
-        if (flights.isEmpty()) {
-            throw new NoFlightsFoundException();
+
+        List<Flight> flights ;
+        try {
+            flights = flightsRepository.findAll();
+        } catch (Exception e) {
+            throw new FlightServiceException("Error occurred while fetching flights.", e);
         }
         List<FlightDTO> returnList=new ArrayList<>();
         for(Flight flight:flights)
@@ -176,7 +175,7 @@ public class FlightService {
         int startIndex = (pageNumber - 1) * pageSize;
         int endIndex = Math.min(startIndex + pageSize, returnList.size());
         if (returnList.isEmpty()) {
-            throw new NoFlightsFoundException();
+            throw new NoRecordFoundException("Flight record is unavailable");
         }
         return returnList.subList(startIndex, endIndex);
     }
@@ -245,12 +244,14 @@ public class FlightService {
                     flightDTO.setIropStatus(nextRecord[4]);
                     flightDTO.setTotalSeats(Integer.parseInt(nextRecord[5]));
                     flightDTO.setHasBusinessClass(Boolean.parseBoolean(nextRecord[6]));
-
                     Flight flight = convertToEntity(flightDTO);
-                    Flight savedFlight = flightsRepository.save(flight);
+                    try {
+                        flightsRepository.save(flight);
+                    } catch (Exception e) {
+                        throw new FlightServiceException("Error occurred while updating flight.", e);
+                    }
                 }
             }
-
             return ResponseEntity.status(HttpStatus.CREATED).body("CSV data has been processed and saved.");
         } catch (IOException e) {
             e.printStackTrace();

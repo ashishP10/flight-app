@@ -5,3 +5,4 @@ public class FlightNotFoundException extends RuntimeException{
         super("Flight not found with id : " + id + ", please provide the correct id");
     }
 }
+
