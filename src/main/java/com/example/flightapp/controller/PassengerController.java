@@ -50,4 +50,23 @@ public class PassengerController {
         PassengerDTO updatedPassenger = passengerService.updatePassenger(id, passengerDTO);
         return ResponseEntity.ok(updatedPassenger);
     }
+    @GetMapping("/{id}")
+    public ResponseEntity<PassengerDTO> getPassengerById(@PathVariable Long id) {
+        PassengerDTO passengerDTO = passengerService.getPassengerById(id);
+        if (passengerDTO != null) {
+            return ResponseEntity.ok(passengerDTO);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<String> deletePassenger(@PathVariable Long id) {
+        boolean deleted = passengerService.deletePassenger(id);
+        if (deleted) {
+            return ResponseEntity.ok("Delay row deleted successfully");
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
 }

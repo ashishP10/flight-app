@@ -59,14 +59,14 @@ public class DelayController {
             return ResponseEntity.notFound().build();
         }
     }
-//    @DeleteMapping("/{id}")
-//    public ResponseEntity<String> deleteFlight(@PathVariable Long id) {
-//        boolean deleted = delayService.deleteDelay(id);
-//        if (deleted) {
-//            return ResponseEntity.ok("Delay row deleted successfully");
-//        } else {
-//            return ResponseEntity.notFound().build();
-//        }
-//    }
+    @DeleteMapping("/{id}")
+    public ResponseEntity<String> deleteDelay(@PathVariable Long id) {
+        boolean deleted = delayService.deleteDelay(id);
+        if (deleted) {
+            return ResponseEntity.ok("Delay row deleted successfully");
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
 
 }

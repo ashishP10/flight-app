@@ -17,6 +17,7 @@ public class Passenger {
     private String passportNo   ;
     private String country;
 
+    private boolean isDeleted = false;
     @ManyToOne
     @JoinColumn
     private Flight flight;

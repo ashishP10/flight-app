@@ -142,16 +142,11 @@ public class FlightServiceTests {
         Long flightId = 1L;
         Flight mockFlight = initModel(new Flight());
         mockFlight.setId(flightId);
-
         when(flightRepository.findById(flightId)).thenReturn(Optional.of(mockFlight));
         when(modelMapper.map(mockFlight, FlightDTO.class)).thenReturn(new FlightDTO());
-
         FlightDTO flight = flightService.getFlightById(flightId);
-
-
         assertEquals(flightId, flight.getId());
     }
-
     @Test
     public void testCreateFlight() {
         FlightDTO flightDTO = initDTO(new FlightDTO());
@@ -161,11 +156,8 @@ public class FlightServiceTests {
         flightDTO.setIropStatus("CX");
         flightDTO.setTotalSeats(150);
         flightDTO.setHasBusinessClass(true);
-
         Flight mockFlight = initModel(new Flight());
-
         Flight flight = initModel(new Flight());
-
         when(modelMapper.map(flightDTO, Flight.class)).thenReturn(mockFlight);
         when(modelMapper.map(flight, FlightDTO.class)).thenReturn(flightDTO);
          when(flightRepository.save(mockFlight)).thenReturn(mockFlight);
