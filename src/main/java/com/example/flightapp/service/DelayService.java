@@ -86,31 +86,31 @@ public class DelayService {
         if (delayOptional.isPresent()) {
             return convertEntityToDto(delayOptional.get());
         } else {
-            throw new FlightNotFoundException(id);
+            throw new NoRecordFoundException("No record found for id: "+ id);
         }
     }
 
-//    public boolean deleteDelay(Long id) {
-//        List<Delay> delays ;
-//        try{
-//            delays = delayRepository.findAll();
-//        }catch (Exception e)
-//        {
-//            throw new NoRecordFoundException("No record is present for the id:" + id);
-//        }
-//        for(Delay delay:delays)
-//        {
-//            if(delay.getId().equals(id))
-//            {   delay.setDeleted(true);
-//                try {
-//                    delayRepository.save(delay);
-//                    return true;
-//                } catch (Exception e) {
-//                    throw new DelayServiceException("Error occurred while updating flight.", e);
-//                }
-//            }
-//        }
-//        return false;
-//    }
+    public boolean deleteDelay(Long id) {
+        List<Delay> delays ;
+        try{
+            delays = delayRepository.findAll();
+        }catch (Exception e)
+        {
+            throw new NoRecordFoundException("No record is present for the id:" + id);
+        }
+        for(Delay delay:delays)
+        {
+            if(delay.getId().equals(id))
+            {   delay.setDeleted(true);
+                try {
+                    delayRepository.save(delay);
+                    return true;
+                } catch (Exception e) {
+                    throw new DelayServiceException("Error occurred while deleting flight.", e);
+                }
+            }
+        }
+        return false;
+    }
 
 }

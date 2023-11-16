@@ -80,6 +80,36 @@ public class PassengerService {
         }
 
     }
+    public PassengerDTO getPassengerById(Long id) {
+        Optional<Passenger> passengerOptional = passengerRepository.findById(id);
+        if (passengerOptional.isPresent()) {
+            return convertEntityToDto(passengerOptional.get());
+        } else {
+            throw new NoRecordFoundException("No record found for the id: "+id);
+        }
+    }
+    public boolean deletePassenger(Long id) {
+        List<Passenger> passengerList ;
+        try{
+            passengerList = passengerRepository.findAll();
+        }catch (Exception e)
+        {
+            throw new NoRecordFoundException("No record is present for the id:" + id);
+        }
+        for(Passenger passenger:passengerList)
+        {
+            if(passenger.getId().equals(id))
+            {   passenger.setDeleted(true);
+                try {
+                    passengerRepository.save(passenger);
+                    return true;
+                } catch (Exception e) {
+                    throw new DelayServiceException("Error occurred while deleting Passenger.", e);
+                }
+            }
+        }
+        return false;
+    }
     public void updatePssengerFromDTO(Passenger passenger,PassengerDTO passengerDTO){
         passenger.setCountry(passengerDTO.getCountry());
         passenger.setAge(passengerDTO.getAge());

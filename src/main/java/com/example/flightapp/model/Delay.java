@@ -14,11 +14,20 @@ public class Delay {
     private String reason;
     private Integer time;
 
+    private boolean isDeleted = false;
     private Delay(Long id,Integer code,String reason,Integer time){
         this.id=id;
         this.code=code;
         this.reason=reason;
         this.time=time;
+    }
+
+    public void setDeleted(boolean deleted) {
+        isDeleted = deleted;
+    }
+
+    public boolean isDeleted() {
+        return isDeleted;
     }
 
     public Delay() {
@@ -69,6 +78,10 @@ public class Delay {
             reason ="WWW";
             time=0;
         }
+        public DelayBuilder setId(Long id) {
+            this.id = id;
+            return this;
+        }
         public DelayBuilder setCode(Integer code) {
             this.code = code;
             return this;
@@ -83,6 +96,11 @@ public class Delay {
             this.time = time;
             return this;
         }
+        public DelayBuilder setDeleted(Integer time) {
+            this.time = time;
+            return this;
+        }
+
         public Delay build(){
             return new Delay(id,code,reason,time);
         }
